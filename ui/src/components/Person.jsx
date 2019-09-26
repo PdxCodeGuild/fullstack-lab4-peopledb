@@ -1,26 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useGlobal } from "reactn"
 import { client } from '../api/client';
 import PeopleForm from './PeopleForm';
 
 const Person = (props) => {
   const { person } = props;
+  const [people, setPeople] = useGlobal("people");
   const [editing, setEditing] = useState(false);
 
   const handleDelete = async () => {
-    await client.delete("/people/" + person._id);
+    const { data } = await client.delete("/people/" + person._id);
+
+    setPeople([
+      ...people.filter((p) => p._id !== data._id)
+    ])
 
     if(props.getPeople) props.getPeople();
   }
 
   const handleEdit = () => {
-    if(props.getPeople) props.getPeople();
     setEditing(!editing);
   }
 
   return (
     <div>
       {editing && (
-        <PeopleForm person={person} getPeople={handleEdit} />
+        <PeopleForm person={person} onSubmit={handleEdit} />
       )}
       {!editing && (
         <>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useGlobal } from "reactn"
 import { client } from '../api/client';
 
 const PeopleForm = (props) => {
@@ -12,21 +12,34 @@ const PeopleForm = (props) => {
   };
 
   const [formState, setFormState] = useState(initialState);
+  const [people, setPeople] = useGlobal("people");
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    console.log(person)
 
-    if(person) {
-      await client.patch("/people/" + person._id, formState);
+    if(Object.keys(person).length > 0) {
+      const { data } = await client.patch("/people/" + person._id, formState);
+      const index = people.findIndex((p) => p._id === person._id);
+
+      const newPeople = [...people];
+      newPeople[index] = data;
+      setPeople(newPeople);
+
     } else {
-      await client.post("/people", formState);
+      const { data } = await client.post("/people", formState);
+      setPeople([
+        ...people,
+        data
+      ])
+
       setFormState(initialState);
     }
 
     // Check if the onSubmit function was passed as a property
     // to this component, if so call it!
     // && typeof props.getPeople === "function" for full sanity-check
-    if(props.getPeople) props.getPeople();
+    if(props.onSubmit) props.onSubmit();
 
   }
   const handleChange = (e) => {

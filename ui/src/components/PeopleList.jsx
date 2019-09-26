@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useGlobal, useDispatch } from "reactn"
 import { client } from '../api/client';
 import PeopleForm from "./PeopleForm";
 import Person from './Person';
 
 
 const PeopleList = () => {
-  const [people, setPeople] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [people, setPeople] = useGlobal("people");
+  const [loading, setLoading] = useState(false);
 
   const getPeople = async () => {
     setLoading(true);
@@ -32,7 +32,6 @@ const PeopleList = () => {
           {people.map((person) => (
             <Person 
               key={person._id} 
-              getPeople={getPeople}
               person={person}
             />
           ))}
